@@ -16,12 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: test1
-      shell: bash 
-      run: echo "${{ github.head_ref }}"
-    - name: test2
-      shell: bash 
-      run: echo "${{ github.event.pull_request.number }}"
     - name: Set up JDK
       uses: actions/setup-java@v1
       with:
