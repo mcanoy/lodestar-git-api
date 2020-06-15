@@ -18,7 +18,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: test2
       shell: bash 
-      run: echo "${github.event.number}"
+      run: echo "${github.event}"
     - name: test1
       shell: bash 
       run: echo "${github}"
