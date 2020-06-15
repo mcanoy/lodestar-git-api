@@ -27,4 +27,6 @@ jobs:
       with:
         java-version: 13.0.1
     - name: Sonar Check
-      run: mvn -B verify sonar:sonar -q -Dsonar.login=${{ secrets.SONAR_TOKEN }} -Dsonar.pullrequest.base=master -Dsonar.pullrequest.key=${{ github.event.pull_request.number }} -Dsonar.pullrequest.branch=${{ github.head_ref }}
+      env:
+        EL_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: mvn -B verify sonar:sonar -q -Dsonar.login=$EL_TOKEN -Dsonar.pullrequest.base=master -Dsonar.pullrequest.key=${{ github.event.pull_request.number }} -Dsonar.pullrequest.branch=${{ github.head_ref }}
