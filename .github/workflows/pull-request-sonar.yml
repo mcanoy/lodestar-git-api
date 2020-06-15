@@ -1,4 +1,4 @@
-name: PR check
+name: PR Sonarqube
 
 on:
   pull_request:
@@ -12,13 +12,19 @@ on:
       
 
 jobs:
-  build:
+  sonar:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: test1
+      shell: bash 
+      run: echo "${github.head_ref}"
+    - name: test2
+      shell: bash 
+      run: echo "${github.event.pull_request.number}"
     - name: Set up JDK
       uses: actions/setup-java@v1
       with:
         java-version: 13.0.1
     - name: Sonar Check
-      run: mvn -B verify -q -Dsonar.login=${secrets.SONAR_TOKEN} -Dsonar.pullrequest.base=master -Dsonar.pullrequest.key=${githb.event.pull_request.number} -Dsonar.pullrequest.branch=${github.head_ref}
+      run: mvn -B verify -q -Dsonar.login=${secrets.SONAR_TOKEN} -Dsonar.pullrequest.base=master -Dsonar.pullrequest.key=${github.event.pull_request.number} -Dsonar.pullrequest.branch=${github.head_ref}
