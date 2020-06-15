@@ -1,0 +1,24 @@
+name: PR check
+
+on:
+  pull_request:
+    paths-ignore:
+      - deployment/**
+      - .vscode/**
+      - README.md
+      - lombok.config
+      - .gitignore
+
+      
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK
+      uses: actions/setup-java@v1
+      with:
+        java-version: 13.0.1
+    - name: Sonar Check
+      run: mvn -B verify -q -Dsonar.login=${secrets.SONAR_TOKEN} -Dsonar.pullrequest.base=master -Dsonar.pullrequest.key=${githb.event.pull_request.number} -Dsonar.pullrequest.branch=${github.head_ref}
