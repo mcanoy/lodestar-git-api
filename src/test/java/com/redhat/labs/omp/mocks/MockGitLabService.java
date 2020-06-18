@@ -12,6 +12,7 @@ import javax.ws.rs.core.Response.Status;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import com.redhat.labs.omp.models.gitlab.CommitMultiple;
+import com.redhat.labs.omp.models.gitlab.DeployKey;
 import com.redhat.labs.omp.models.gitlab.File;
 import com.redhat.labs.omp.models.gitlab.Group;
 import com.redhat.labs.omp.models.gitlab.Hook;
@@ -83,23 +84,10 @@ public class MockGitLabService implements GitLabService {
         List<ProjectSearchResults> results = new ArrayList<>();
         
         if("iac".contentEquals(name)) {
-            ProjectSearchResults project = ProjectSearchResults.builder().id(45).name("iac").description("bla").path("path").namespace(new Namespace()).build();
+            ProjectSearchResults project = ProjectSearchResults.builder().id(45).name("iac").description("bla").path("iac")
+                    .namespace(Namespace.builder().id(45).build()).build();
             results.add(project);
         }
-
-        
-
-//        results.add(
-//                ProjectSearchResults.builder()
-//                    .id(3)
-//                    .name("iac")
-//                    .path("iac")
-//                    .description("iac for project1")
-//                    .namespace(Namespace
-//                            .builder()
-//                            .parentId(2)
-//                            .build())
-//                    .build());
 
         return results;
 
@@ -136,7 +124,9 @@ public class MockGitLabService implements GitLabService {
 
     @Override
     public Project updateProject(Integer projectId, Project project) {
-        // TODO Auto-generated method stub
+        if(projectId == 45) {
+            return new Project();
+        }
         return null;
     }
 
@@ -150,8 +140,14 @@ public class MockGitLabService implements GitLabService {
     public File getFile(String projectId, String filePath, String ref) {
 
         if ("schema/meta.dat".equalsIgnoreCase(filePath)) {
-
             String content = "./residency.yml";
+            content = new String(EncodingUtils.base64Encode(content.getBytes()), StandardCharsets.UTF_8);
+            return File.builder().filePath(filePath).content(content).build();
+
+        }
+        
+        if ("schema/webhooks.yaml".equalsIgnoreCase(filePath)) {
+            String content = ResourceLoader.load("webhooks.yaml");
             content = new String(EncodingUtils.base64Encode(content.getBytes()), StandardCharsets.UTF_8);
             return File.builder().filePath(filePath).content(content).build();
 
@@ -227,7 +223,9 @@ public class MockGitLabService implements GitLabService {
 
     @Override
     public Response commitMultipleFiles(Integer projectId, CommitMultiple commit) {
-        // TODO: need to be able to have negative scenarios
+        if("fail@commitmultiplefiles.com".equals(commit.getAuthorEmail())) {
+            return Response.ok().build();
+        }
         return Response.status(201).build();
     }
 
@@ -290,6 +288,11 @@ public class MockGitLabService implements GitLabService {
         if("2".equals(idOrPath)) {
             return Group.builder().fullPath("top/dog").build();
         }
+        return null;
+    }
+
+    @Override
+    public Response updateDeployKey(Integer projectId, Integer deployKeyId, DeployKey deployKey) {
         return null;
     }
 

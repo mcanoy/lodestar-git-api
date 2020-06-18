@@ -11,14 +11,14 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.redhat.labs.exception.UnexpectedGitLabResponseException;
+import com.redhat.labs.omp.models.gitlab.DeployKey;
 import com.redhat.labs.omp.models.gitlab.Project;
 import com.redhat.labs.omp.models.gitlab.ProjectSearchResults;
 import com.redhat.labs.omp.rest.client.GitLabService;
 
 @ApplicationScoped
 public class ProjectService {
-    public static Logger LOGGER = LoggerFactory.getLogger(ProjectService.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(ProjectService.class);
 
     @Inject
     @RestClient
@@ -28,8 +28,7 @@ public class ProjectService {
     boolean doNotDelete;
 
     // get a project
-    public Optional<Project> getProjectByName(Integer namespaceId, String name)
-            throws UnexpectedGitLabResponseException {
+    public Optional<Project> getProjectByName(Integer namespaceId, String name) {
 
         Optional<Project> optional = Optional.empty();
 
@@ -50,7 +49,8 @@ public class ProjectService {
 
     }
 
-    public List<ProjectSearchResults> getAllProjectsByNane(String name) {
+    //Needed anymore?
+    public List<ProjectSearchResults> getAllProjectsByName(String name) {
         return gitLabService.getProjectByName(name);
     }
 
@@ -83,7 +83,7 @@ public class ProjectService {
             project.preserve();
         }
 
-        LOGGER.debug("create project  " + project);
+        LOGGER.debug("create project {}", project);
 
         // try to create project
         Project createdProject = gitLabService.createProject(project);
@@ -115,9 +115,11 @@ public class ProjectService {
         gitLabService.deleteProjectById(projectId);
     }
 
-    // enable deployment key
+    // enable deployment key - by default it's ready only but we need to write so let's 2-step
     public void enableDeploymentKeyOnProject(Integer projectId, Integer deployKey) {
+        
         gitLabService.enableDeployKey(projectId, deployKey);
+        gitLabService.updateDeployKey(projectId, deployKey, DeployKey.builder().title("LodeStar DK").canPush(true).build());
     }
 
 }
